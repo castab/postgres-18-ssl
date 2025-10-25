@@ -1,7 +1,9 @@
 # SSL-enabled Postgres 18 Image
 Postgres 18 template for Railway deployment and hosting.
 
-Largely taken from the Railway's repository: https://github.com/railwayapp-templates/postgres-ssl
+Largely taken from the [Railway's repository](https://github.com/railwayapp-templates/postgres-ssl) with changes to support Postgres 18.
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.com/deploy/postgresql-18-1?referralCode=TQuzNl&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 ## ⚠️ Important: Upgrading from PostgreSQL 17 or Earlier
 
