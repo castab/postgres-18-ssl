@@ -1,4 +1,15 @@
-FROM postgres:18
+ARG POSTGRES_VERSION=18.6
+
+FROM postgres:${POSTGRES_VERSION}
+
+ARG POSTGRES_VERSION
+
+# Refuse to build outside the Postgres 18.x line, since PGDATA handling and
+# the SSL init scripts assume the 18-specific data directory layout
+RUN case "$POSTGRES_VERSION" in \
+      18|18.*|18-*) ;; \
+      *) echo "POSTGRES_VERSION must stay within the Postgres 18.x line (got '$POSTGRES_VERSION')." >&2; exit 1 ;; \
+    esac
 
 # Install OpenSSL and sudo
 RUN apt-get update && apt-get install -y openssl sudo
