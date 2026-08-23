@@ -57,3 +57,37 @@ docker build -f Dockerfile.18 --build-arg POSTGRES_VERSION=18.6-bookworm -t post
 ```
 
 > **Note:** `POSTGRES_VERSION` must stay within the Postgres **18.x** line — this image's data directory handling (see PGDATA migration above) and SSL setup scripts assume the Postgres 18 major version. The build enforces this: setting `POSTGRES_VERSION` to a different major version (e.g. `17` or `19`) fails the Docker build with an explicit error instead of producing a broken image.
+
+## Environment Variables
+
+**No configuration is required to deploy this template on Railway.** Every variable below ships with a secure, working default — a random password is generated automatically, networking is wired to Railway's private domain, and SSL is enabled out of the box. Click "Deploy on Railway" and it works as-is.
+
+The variables are documented below for reference, and in case you want to customize the deployment.
+
+### Wired / computed — leave as-is
+
+These reference other variables or Railway platform values. Change the variable they point to instead of editing these directly (e.g. edit `POSTGRES_DB`, not `PGDATABASE`).
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `PGDATA` | `/var/lib/postgresql/18/docker` | Postgres 18's data directory path (version-specific, relative to the mounted volume). |
+| `PGHOST` | `${{RAILWAY_PRIVATE_DOMAIN}}` | Internal hostname for connecting to Postgres over Railway's private network. |
+| `PGUSER` | `${{POSTGRES_USER}}` | Connecting user, mirrors `POSTGRES_USER`. |
+| `PGDATABASE` | `${{POSTGRES_DB}}` | Database to connect to, mirrors `POSTGRES_DB`. |
+| `PGPASSWORD` | `${{POSTGRES_PASSWORD}}` | Connecting user's password, mirrors `POSTGRES_PASSWORD`. |
+| `DATABASE_URL` | computed | Full connection string for internal access from other services in the same Railway project. |
+| `DATABASE_PUBLIC_URL` | computed | Full connection string for external access via Railway's public TCP proxy. |
+
+### Optional overrides
+
+Safe to change in Railway's Service → Variables if you want different defaults.
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `POSTGRES_DB` | `railway` | Name of the default database created on first init. |
+| `POSTGRES_USER` | `postgres` | Superuser account created on first init. |
+| `POSTGRES_PASSWORD` | auto-generated (32 chars) | Password for `POSTGRES_USER`, generated automatically by Railway. Override only if you need a specific password. |
+| `PGPORT` | `5432` | Port Postgres listens on. |
+| `SSL_CERT_DAYS` | `820` | Validity period, in days, for the self-signed SSL certs generated at init. |
+| `POSTGRES_VERSION` | `18.6` | Postgres image tag to build (see [Overriding the Postgres version](#overriding-the-postgres-version) above). Build-time only, unlike the other variables here which are read at container runtime — must stay within the 18.x line. |
+| `RAILWAY_DEPLOYMENT_DRAINING_SECONDS` | `60` | Grace period between SIGTERM and SIGKILL for the old deployment during a rollout, letting in-flight connections finish. |
